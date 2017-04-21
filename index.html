@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Paste RTF</title>
+<script type="text/javascript">
+window.onload = function()
+{
+	document.getElementById('test').addEventListener('paste', function(e){
+		handlePasteImage(e, document.getElementById('elem'));
+	});
+}
+
+function createThumbnail(dataURL, params, callback)
+{
+	var image = new Image();
+	image.onload = function()
+	{
+		var width = image.width;
+		var height = image.height;
+		var maxWidth = params.maxWidth || 0;
+		var maxHeight = params.maxHeight || 0;
+		var originalWidth = width; 
+		var originalHeight = height;
+		// if maxWidth < width
+		if(maxWidth > 0 && maxWidth < width)
+		{
+			var w1 = maxWidth;
+			var h1 = height * maxWidth/width;
+			width = w1;
+			height = h1;
+		}
+		// if maxHeight < height
+		if(maxHeight > 0 && maxHeight < height)
+		{
+			var h2 = maxHeight;
+			var w2 = width * maxHeight/height;
+			width = w2;
+			height = h2;
+		}
+		width = parseInt(width);
+		height = parseInt(height);
+		var cvs = document.createElement("canvas");
+		var ctx = cvs.getContext("2d");
+		cvs.width = width;
+		cvs.height = height;
+		try{
+			ctx.drawImage(image, 0, 0, originalWidth, originalHeight, 0, 0, width, height);
+			var dataURL = cvs.toDataURL() || "";
+			{
+				if(typeof callback == 'function')
+				{
+					callback(dataURL);
+				}
+			}
+		}
+		catch(e)
+		{
+		}
+	}
+	image.src = dataURL;
+}
+function handlePasteImage(e, elem) 
+{
+	if (e && e.clipboardData && e.clipboardData.getData) 
+	{
+		if((/Files/.test(e.clipboardData.types) && !/text\/html/.test(e.clipboardData.types))) {
+			// Paste image from other application
+			var blob = e.clipboardData.items[0].getAsFile();
+			var reader = new window.FileReader();
+			reader.readAsDataURL(blob); 
+			reader.onloadend = function(){
+				createThumbnail(reader.result, {maxWidth:200, maxHeight:150}, function(data){
+					elem.innerHTML = '<img src="'+data+'">';
+				});
+			}
+			if(e.preventDefault)
+			{
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		}
+		else if(/Files/.test(e.clipboardData.types) && /text\/html/.test(e.clipboardData.types))
+		{
+			// Paste image from web application
+			var html = e.clipboardData.getData('text/html');
+			var container = document.createElement('div');
+			container.innerHTML = html;
+			for(var i in container.childNodes)
+			{
+				if(container.childNodes.item(i).tagName == 'IMG' || container.childNodes.item(i).tagName == 'img')
+				{
+					var src = container.childNodes.item(i).getAttribute('src');
+					elem.innerHTML = '<img src="'+src+'">';
+				}
+			}
+			if(e.preventDefault)
+			{
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		}
+		else if(/text\/html/.test(e.clipboardData.types)) 
+		{
+			var data = e.clipboardData.getData('text/html');
+			e.clipboardData.setData('text/plain', data);
+			if(e.preventDefault)
+			{
+				e.stopPropagation();
+				e.preventDefault();
+			}
+		}
+		else if(/text\/plain/.test(e.clipboardData.types)) 
+		{
+		}
+		else 
+		{
+		}
+	}
+	else 
+	{
+	}
+}
+</script>
+</head>
+<style type="text/css">
+#elem{
+	margin:10px 0;
+}
+#elem img{
+	vertical-align:bottom;
+}
+</style>
+
+<body>
+<textarea name="test" id="test" cols="45" rows="5" autofocus placeholder="Focus here and paste image from clipboard"></textarea>
+<div id="elem"></div>
+</body>
+</html>
