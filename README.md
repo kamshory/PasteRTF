@@ -1,7 +1,7 @@
 # PasteRTF
 This script will paste data from clipboard containing image, HTML or plain text.
 
-When you copying object to the clipboard and paste it to web application, clipboard data type can be on or more of:
+When you copying object to the clipboard and paste it to web application, clipboard data type can be one or more of:
 
 1. text/plain
 2. text/html
