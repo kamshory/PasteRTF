@@ -12,3 +12,7 @@ If you copying image from web application, the clipboard data type is text/html 
 If clipboard data type is Files, program will get blob data as a file using FileReader. Then the FileReader will produce result as base64 data of the image. The image data can be used as you want.
 
 If clipboard data type is Files and text/html, program will parse the text/html data and find the absolute image URL from it. Then image URL can be used as you want.
+
+Some Windows applications like Microsoft Visio and Adobe Fireworks, automaticaly convert object as image when you copy it and can be paste as an image to other application, including web application. So you can copy Microsoft Visio or Adobe Fireworks object as an image to your application without save it as file first.
+
+Equation Editor in Microsoft Word does not convert the object when you copy it into image. So, if you copy some equation from Microsoft Word, you will only get text data when you paste it into web application. Fortunately, you can use Snipping Tool to put equation from Microsoft Word into web application without save it firts.
